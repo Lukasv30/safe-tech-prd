@@ -1,0 +1,25 @@
+# SO / editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Segredos e ambiente
+.env
+.env.*
+!.env.example
+
+# Dependências e builds (futuros)
+node_modules/
+dist/
+build/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Logs e dumps
+*.log
+*.dump
+*.bak
