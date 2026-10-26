@@ -6,22 +6,49 @@ gestores públicos acompanham, atendem e resolvem essas ocorrências, e equipame
 instalados nas praças (câmeras, iluminação inteligente, botões de pânico, totens) geram alertas em
 tempo real.
 
-> Projeto acadêmico desenvolvido para a disciplina **DAI** — UNINASSAU.
-> Protótipo (Figma Make): https://www.figma.com/make/ILamNGNr7s2SHJDX4IiLkn/SafeTech-%E2%80%94-Seguran%C3%A7a-em-Pra%C3%A7as-P%C3%BAblicas
+> Projeto Prático **AV2 — Desafios do Banco de Oportunidades (Implementação)**, Edital de Convocação nº 02/2026.2.
+> Centro Universitário Maurício de Nassau (UNINASSAU) — Campus Recife (Graças) · Semestre 2026.2 · Prof. Breno Holanda.
+> A AV2 transforma o protótipo validado na AV1 em uma aplicação real e funcional, com código-fonte estruturado,
+> banco de dados e integrações, resolvendo um desafio do Banco de Oportunidades da Prefeitura do Recife.
+>
+> Protótipo da AV1 (Figma Make): https://www.figma.com/make/ILamNGNr7s2SHJDX4IiLkn/SafeTech-%E2%80%94-Seguran%C3%A7a-em-Pra%C3%A7as-P%C3%BAblicas
 
 ## Equipe
 
-| Nome | GitHub | Papel |
-|------|--------|-------|
-| Lucas Victor | [@Lukasv30](https://github.com/Lukasv30) | — |
-| _preencher_ | _preencher_ | — |
-| _preencher_ | _preencher_ | — |
+| Nome | GitHub | Papel técnico |
+|------|--------|---------------|
+| Lucas Victor | [@Lukasv30](https://github.com/Lukasv30) | _definir_ |
+| _preencher_ | [@carolssgalvao-ai](https://github.com/carolssgalvao-ai) | _definir_ |
+| _preencher_ | [@davi-vini-01](https://github.com/davi-vini-01) | _definir_ |
+| _preencher_ | [@santhiagoagst](https://github.com/santhiagoagst) | _definir_ |
+| _preencher_ | _preencher_ | _definir_ |
 
-## Cronograma / Checkpoints
+Papéis sugeridos pelo edital: Desenvolvedor Front-end, Desenvolvedor Back-end, DBA, QA/Testes e Líder Técnico.
+
+## Cronograma oficial (Edital nº 02/2026.2)
 
 | Data | Etapa | Entregáveis | Status |
 |------|-------|-------------|--------|
 | 30/10/2026 | Checkpoint 1 | Repositório criado (com todos os membros adicionados) e Modelagem Lógica do Banco de Dados / DDL inicial | 🟡 Em andamento |
+| 13/11/2026 | Checkpoint 2 | Endpoints principais criados e conexão com o banco de dados funcionando | ⚪ Não iniciado |
+| 27/11/2026 | Checkpoint 3 | Aplicação funcional ("MVP" integrado). Front-end consumindo o Back-end | ⚪ Não iniciado |
+| 01/12 a 08/12/2026 | AV2 — Apresentação Oficial | Pitch Técnico, entrega do repositório final e demonstração do software ao vivo | ⚪ Não iniciado |
+
+### Entregáveis obrigatórios
+
+- **Repositório de código-fonte:** este repositório, com o código da aplicação.
+- **Banco de dados:** scripts de criação e inserção de dados — [database/](database/).
+- **Documentação técnica:** atualização do Template de Documentação, focado na Arquitetura da Solução — [docs/](docs/).
+- **Apresentação final:** demonstração da aplicação rodando ao vivo e pitch.
+
+### Critérios de avaliação
+
+| Critério | Pontuação | O que é avaliado |
+|----------|-----------|------------------|
+| Funcionalidade e Aderência | 3,0 | A aplicação funciona sem erros críticos e faz o que o protótipo da AV1 propôs |
+| Qualidade do Código e Boas Práticas | 3,0 | Organização, legibilidade e uso adequado de padrões no repositório |
+| Estrutura e Persistência de Dados | 2,0 | Modelagem correta e capacidade de salvar/recuperar informações |
+| Pitch e Domínio Técnico | 2,0 | Clareza na explicação, segurança da equipe nas tecnologias e demonstração fluida |
 
 ## Estrutura do repositório
 
@@ -30,6 +57,7 @@ safe-tech-prd/
 ├── README.md
 ├── .gitignore
 ├── docs/
+│   ├── arquitetura/                 # Template de Documentação (Arquitetura da Solução) — checkpoints 2 e 3
 │   ├── requisitos/
 │   │   └── requisitos.md            # Requisitos funcionais e não funcionais
 │   ├── modelagem/
