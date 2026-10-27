@@ -17,11 +17,10 @@ tempo real.
 
 | Nome | GitHub | Papel técnico |
 |------|--------|---------------|
-| Lucas Victor | [@Lukasv30](https://github.com/Lukasv30) | _definir_ |
-| _preencher_ | [@carolssgalvao-ai](https://github.com/carolssgalvao-ai) | _definir_ |
-| _preencher_ | [@davi-vini-01](https://github.com/davi-vini-01) | _definir_ |
-| _preencher_ | [@santhiagoagst](https://github.com/santhiagoagst) | _definir_ |
-| _preencher_ | _preencher_ | _definir_ |
+| Lucas Victor | [@Lukasv30](https://github.com/Lukasv30) | Engenheiro de Dados |
+| Ana Carolina | [@carolssgalvao-ai](https://github.com/carolssgalvao-ai) | Product Manager |
+| Davi Mendes  | [@davi-vini-01](https://github.com/davi-vini-01) | Desenvolvedor BackEnd |
+| Santhiago Augusto | [@santhiagoagst](https://github.com/santhiagoagst) | Desenvolvedor FrontEnd |
 
 Papéis sugeridos pelo edital: Desenvolvedor Front-end, Desenvolvedor Back-end, DBA, QA/Testes e Líder Técnico.
 
@@ -29,8 +28,8 @@ Papéis sugeridos pelo edital: Desenvolvedor Front-end, Desenvolvedor Back-end, 
 
 | Data | Etapa | Entregáveis | Status |
 |------|-------|-------------|--------|
-| 30/10/2026 | Checkpoint 1 | Repositório criado (com todos os membros adicionados) e Modelagem Lógica do Banco de Dados / DDL inicial | 🟡 Em andamento |
-| 13/11/2026 | Checkpoint 2 | Endpoints principais criados e conexão com o banco de dados funcionando | ⚪ Não iniciado |
+| 30/10/2026 | Checkpoint 1 | Repositório criado (com todos os membros adicionados) e Modelagem Lógica do Banco de Dados / DDL inicial | 🟢 Finalizado |
+| 13/11/2026 | Checkpoint 2 | Endpoints principais criados e conexão com o banco de dados funcionando | 🟡 Em andamento |
 | 27/11/2026 | Checkpoint 3 | Aplicação funcional ("MVP" integrado). Front-end consumindo o Back-end | ⚪ Não iniciado |
 | 01/12 a 08/12/2026 | AV2 — Apresentação Oficial | Pitch Técnico, entrega do repositório final e demonstração do software ao vivo | ⚪ Não iniciado |
 
