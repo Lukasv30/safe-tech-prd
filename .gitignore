@@ -23,3 +23,7 @@ venv/
 *.log
 *.dump
 *.bak
+
+# Supabase CLI
+supabase/.temp/
+supabase/.branches/

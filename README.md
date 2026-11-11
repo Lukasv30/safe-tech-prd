@@ -56,7 +56,9 @@ safe-tech-prd/
 ├── README.md
 ├── .gitignore
 ├── docs/
+│   ├── api/                         # Contrato da API (endpoints.md) e coleção de testes (safetech.http)
 │   ├── arquitetura/                 # Template de Documentação (Arquitetura da Solução) — checkpoints 2 e 3
+│   ├── checkpoint-2/                # Plano de ação e roteiro passo a passo de cada membro
 │   ├── requisitos/
 │   │   └── requisitos.md            # Requisitos funcionais e não funcionais
 │   ├── modelagem/
@@ -75,14 +77,32 @@ safe-tech-prd/
 │   │   └── 05_views.sql             # Views de apoio (dashboard, ocorrências abertas)
 │   ├── seeds/
 │   │   └── 01_seed_dev.sql          # Dados iniciais para desenvolvimento
+│   ├── supabase/                    # Grants da API, Auth, RPCs, RLS, Storage (06..11) — só no Supabase
 │   └── scripts/
 │       ├── create_db.sql            # Cria o banco de dados
 │       ├── drop_all.sql             # Remove o schema (reset)
 │       └── run_all.ps1 / run_all.sh # Executa DDL + seeds em ordem
+├── supabase/
+│   ├── config.toml                  # Projeto da Supabase CLI
+│   └── functions/
+│       └── evento-equipamento/      # Edge Function: eventos de câmeras/sensores → alertas
 └── src/
-    ├── backend/                     # API (checkpoints futuros)
-    └── frontend/                    # Interface web/mobile (checkpoints futuros)
+    ├── backend/                     # Reservado (a lógica de servidor vive no Supabase: RPC + Edge Functions)
+    └── frontend/                    # React + Vite + supabase-js
 ```
+
+## Back-end: Supabase (Checkpoint 2)
+
+O back-end é o **Supabase**: PostgreSQL gerenciado com o schema `safetech`, API REST automática (PostgREST),
+funções RPC para as regras de negócio, Supabase Auth para login e uma Edge Function para eventos de equipamentos.
+
+- **Plano de ação e divisão por membro:** [docs/checkpoint-2/README.md](docs/checkpoint-2/README.md).
+- **Ordem de aplicação no SQL Editor:** `database/ddl/01..05` → `database/seeds/01` → `database/supabase/06..11`.
+- **Contrato da API:** [docs/api/endpoints.md](docs/api/endpoints.md) · testes: [docs/api/safetech.http](docs/api/safetech.http).
+- **Configuração local do front:** copie `src/frontend/.env.example` para `.env` e preencha `VITE_SUPABASE_URL` e
+  `VITE_SUPABASE_ANON_KEY` (chaves nunca são commitadas).
+- Como o schema não é o `public`, chamadas REST usam `Accept-Profile: safetech` (GET) ou `Content-Profile: safetech`
+  (POST/PATCH/RPC); no supabase-js basta `createClient(url, key, { db: { schema: 'safetech' } })`.
 
 ## Banco de dados
 
