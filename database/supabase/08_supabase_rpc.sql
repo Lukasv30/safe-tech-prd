@@ -250,7 +250,7 @@ BEGIN
 
     INSERT INTO notificacao (usuario_id, alerta_id, titulo, mensagem)
     SELECT u.id, v_alerta, 'Botão de pânico acionado',
-           (SELECT 'Praça ' || p.nome || ': ' || a.mensagem FROM alerta a JOIN praca p ON p.id = a.praca_id WHERE a.id = v_alerta)
+           (SELECT p.nome || ': ' || a.mensagem FROM alerta a JOIN praca p ON p.id = a.praca_id WHERE a.id = v_alerta)
       FROM usuario u WHERE u.perfil IN ('AGENTE', 'GESTOR') AND u.ativo;
 
     RETURN QUERY SELECT * FROM alerta WHERE id = v_alerta;
