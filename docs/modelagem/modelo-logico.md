@@ -29,7 +29,7 @@ Legenda: **PK** chave primária · **FK** chave estrangeira · **UK** única · 
 | id | UUID | PK, default `gen_random_uuid()` |
 | nome | VARCHAR(120) | NN |
 | email | VARCHAR(160) | NN, UK, formato validado |
-| senha_hash | VARCHAR(255) | NN |
+| senha_hash | VARCHAR(255) | Opcional no Supabase: a senha fica em `auth.users` (ver seção 6) |
 | telefone | VARCHAR(20) | |
 | cpf | CHAR(11) | UK, apenas dígitos |
 | perfil | perfil_usuario | NN, default CIDADAO |
@@ -385,3 +385,18 @@ erDiagram
     equipamento o|--o{ alerta : equipamento_id
     alerta o|--o{ notificacao : alerta_id
 ```
+
+## 6. Integração com o Supabase Auth
+
+A partir do Checkpoint 2 a autenticação é feita pelo **Supabase Auth**. A tabela `usuario` passa a ser o
+*perfil* do usuário autenticado: `usuario.id` é o mesmo UUID de `auth.users.id`, e `senha_hash` deixou de ser
+obrigatória (`ALTER COLUMN senha_hash DROP NOT NULL`, em `database/supabase/02_supabase_auth.sql`).
+
+| Objeto | Tipo | Efeito |
+|--------|------|--------|
+| `handle_new_auth_user()` + `trg_auth_user_created` | Trigger em `auth.users` | Ao criar uma conta no Auth, insere a linha correspondente em `usuario` (nome vindo dos metadados do cadastro, perfil `CIDADAO`) |
+| `perfil_atual()` | Função (SECURITY DEFINER) | Retorna o `perfil` do usuário logado (`auth.uid()`), ou NULL para anônimo |
+| `eh_equipe()` | Função (SECURITY DEFINER) | TRUE quando o perfil é AGENTE, GESTOR ou ADMIN; usada nas políticas RLS e nas RPCs |
+| `eh_gestor()` | Função (SECURITY DEFINER) | TRUE quando o perfil é GESTOR ou ADMIN; libera escrita em `praca`, `categoria_ocorrencia` e `equipamento` |
+
+As políticas de Row Level Security que usam essas funções estão em `database/supabase/03_rls.sql`.

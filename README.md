@@ -54,6 +54,7 @@ Papéis sugeridos pelo edital: Desenvolvedor Front-end, Desenvolvedor Back-end, 
 ```text
 safe-tech-prd/
 ├── README.md
+├── .env.example                     # Modelo das variáveis do healthcheck (SUPABASE_URL, SUPABASE_ANON_KEY)
 ├── .gitignore
 ├── docs/
 │   ├── api/                         # Contrato da API (endpoints.md) e coleção de testes (safetech.http)
@@ -77,8 +78,9 @@ safe-tech-prd/
 │   │   └── 05_views.sql             # Views de apoio (dashboard, ocorrências abertas)
 │   ├── seeds/
 │   │   └── 01_seed_dev.sql          # Dados iniciais para desenvolvimento
-│   ├── supabase/                    # Grants da API, Auth, RPCs, RLS, Storage (06..11) — só no Supabase
+│   ├── supabase/                    # Grants da API, Auth, RLS, Storage, usuários demo (01..05) — só no Supabase
 │   └── scripts/
+│       ├── healthcheck.sh           # Testa a API do Supabase (praças, resumo, RPC)
 │       ├── create_db.sql            # Cria o banco de dados
 │       ├── drop_all.sql             # Remove o schema (reset)
 │       └── run_all.ps1 / run_all.sh # Executa DDL + seeds em ordem
@@ -97,10 +99,12 @@ O back-end é o **Supabase**: PostgreSQL gerenciado com o schema `safetech`, API
 funções RPC para as regras de negócio, Supabase Auth para login e uma Edge Function para eventos de equipamentos.
 
 - **Plano de ação e divisão por membro:** [docs/checkpoint-2/README.md](docs/checkpoint-2/README.md).
-- **Ordem de aplicação no SQL Editor:** `database/ddl/01..05` → `database/seeds/01` → `database/supabase/06..11`.
+- **Ordem de aplicação no SQL Editor:** `database/ddl/01..05` → `database/seeds/01` → `database/supabase/01..05`
+  (detalhes em [Ambiente Supabase](#ambiente-supabase)).
 - **Contrato da API:** [docs/api/endpoints.md](docs/api/endpoints.md) · testes: [docs/api/safetech.http](docs/api/safetech.http).
-- **Configuração local do front:** copie `src/frontend/.env.example` para `.env` e preencha `VITE_SUPABASE_URL` e
-  `VITE_SUPABASE_ANON_KEY` (chaves nunca são commitadas).
+- **Configuração local:** copie `.env.example` para `.env` na raiz (usado pelo healthcheck) e
+  `src/frontend/.env.example` para `src/frontend/.env` (usado pelo front). Preencha com a `Project URL` e a
+  `anon key` do painel. Os arquivos `.env` são ignorados pelo git; as chaves nunca são commitadas.
 - Como o schema não é o `public`, chamadas REST usam `Accept-Profile: safetech` (GET) ou `Content-Profile: safetech`
   (POST/PATCH/RPC); no supabase-js basta `createClient(url, key, { db: { schema: 'safetech' } })`.
 
@@ -132,6 +136,35 @@ psql -U postgres -d safetech -f database/scripts/drop_all.sql
 
 Variáveis de conexão aceitas pelos scripts: `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`
 (padrão: `localhost`, `5432`, `postgres`, vazio, `safetech`).
+
+### Ambiente Supabase
+
+O ambiente oficial do projeto (Checkpoint 2 em diante) é um projeto **Supabase** (PostgreSQL gerenciado).
+A mesma DDL do Checkpoint 1 foi aplicada no **SQL Editor** e, em seguida, os scripts específicos do Supabase.
+
+| Ordem | Arquivo | O que faz |
+|-------|---------|-----------|
+| 1 | `database/ddl/01_schema.sql` … `05_views.sql` | Schema `safetech`, tipos, tabelas, índices, triggers e views (igual ao ambiente local) |
+| 2 | `database/seeds/01_seed_dev.sql` | Dados de desenvolvimento (praças, categorias, equipamentos, ocorrências) |
+| 3 | `database/supabase/01_supabase_grants.sql` | Permissões dos papéis da API: `anon` (leitura pública de praças, categorias e resumo), `authenticated` e `service_role` |
+| 4 | `database/supabase/02_supabase_auth.sql` | Integra o Supabase Auth com `usuario`: `senha_hash` opcional, trigger que cria o perfil ao cadastrar, funções `perfil_atual()`, `eh_equipe()`, `eh_gestor()` |
+| 5 | `database/supabase/03_rls.sql` | Row Level Security por perfil (cidadão vê só as próprias ocorrências; equipe vê alertas, atendimentos e rondas; gestor cadastra praças) |
+| 6 | `database/supabase/04_storage.sql` | Políticas do bucket `anexos` (leitura pública, upload só logado, cada um apaga só o que enviou) |
+| 7 | `database/supabase/05_users_teste.sql` | Promove os usuários demo criados no painel (`*.demo@safetech.app`) para AGENTE, GESTOR e ADMIN |
+
+Configurações feitas no painel (não ficam em SQL): schema `safetech` adicionado em **Settings → API → Exposed
+schemas**; confirmação de e-mail desativada em **Authentication → Providers → Email** (ambiente de
+desenvolvimento); bucket público `anexos` criado em **Storage**; usuários demo criados em **Authentication → Users**.
+
+Para conferir a conexão (lista praças, resumo e consulta um protocolo via RPC):
+
+```bash
+cp .env.example .env            # preencha SUPABASE_URL e SUPABASE_ANON_KEY
+bash database/scripts/healthcheck.sh
+```
+
+As regras de negócio (RPCs) e a Edge Function de eventos de equipamentos são descritas em
+[docs/checkpoint-2/README.md](docs/checkpoint-2/README.md) e no contrato [docs/api/endpoints.md](docs/api/endpoints.md).
 
 ## Visão geral do modelo
 
