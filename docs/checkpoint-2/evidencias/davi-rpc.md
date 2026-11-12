@@ -156,7 +156,16 @@ Corpo: `{"p_atendimento_id":"508bd96e-684c-4933-8b9a-0ca623b1f861","p_relato":"A
 
 ## Edge Function `evento-equipamento`
 
-_Pendente: deploy e teste._
+Deploy feito em 12/11/2026 (`supabase functions deploy evento-equipamento --no-verify-jwt`).
+
+Verificação inicial (antes de cadastrar o `DEVICE_SECRET`):
+
+| Chamada | HTTP | Resposta |
+|---|---|---|
+| `GET /functions/v1/evento-equipamento` | 405 | `{"erro":"Use POST"}` |
+| `POST` sem segredo válido | 401 | `{"erro":"Não autorizado"}` |
+
+_Pendente: cadastrar `DEVICE_SECRET` (Edge Functions → Secrets) e testar `SEM_SINAL` / `NORMALIZADO`._
 
 ```bash
 supabase secrets set DEVICE_SECRET=<segredo>
