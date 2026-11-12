@@ -165,7 +165,65 @@ Verificação inicial (antes de cadastrar o `DEVICE_SECRET`):
 | `GET /functions/v1/evento-equipamento` | 405 | `{"erro":"Use POST"}` |
 | `POST` sem segredo válido | 401 | `{"erro":"Não autorizado"}` |
 
-_Pendente: cadastrar `DEVICE_SECRET` (Edge Functions → Secrets) e testar `SEM_SINAL` / `NORMALIZADO`._
+`DEVICE_SECRET` cadastrado em Edge Functions → Secrets. Testes executados em 12/11/2026.
+
+Todas as chamadas: `POST $SUPABASE_URL/functions/v1/evento-equipamento` com `x-device-secret: <segredo>` e `Content-Type: application/json`.
+
+### SEM_SINAL
+
+```bash
+curl -s -X POST "$SUPABASE_URL/functions/v1/evento-equipamento" \
+  -H "x-device-secret: $DEVICE_SECRET" -H "Content-Type: application/json" \
+  -d '{"codigo":"CAM-DERBY-01","evento":"SEM_SINAL"}'
+```
+
+HTTP 201
+
+```json
+{"ok":true,"alerta":{"id":"3b7b2666-864c-4e6e-8527-9fa14c700fe5","praca_id":"aaaaaaaa-0000-0000-0000-000000000001",
+  "equipamento_id":"bbbbbbbb-0000-0000-0000-000000000001","origem":"EQUIPAMENTO","gravidade":"MEDIA","status":"NOVO",
+  "mensagem":"SEM SINAL em CAMERA CAM-DERBY-01 (Entrada principal)","criado_em":"2026-11-12T20:51:25.247696+00:00"}}
+```
+
+Efeitos conferidos (logado como `gestor.demo`):
+
+| Verificação | HTTP | Resultado |
+|---|---|---|
+| `GET /rest/v1/equipamento?codigo=eq.CAM-DERBY-01` | 200 | `status: "INOPERANTE"` |
+| `GET /rest/v1/vw_alerta_pendente?equipamento_codigo=eq.CAM-DERBY-01` | 200 | alerta `3b7b2666-...` presente, gravidade `MEDIA` |
+| `GET /rest/v1/notificacao` | 200 | `{"titulo":"Alerta de equipamento","mensagem":"SEM SINAL em CAMERA CAM-DERBY-01 (Entrada principal)"}` |
+
+### NORMALIZADO
+
+```bash
+curl -s -X POST "$SUPABASE_URL/functions/v1/evento-equipamento" \
+  -H "x-device-secret: $DEVICE_SECRET" -H "Content-Type: application/json" \
+  -d '{"codigo":"CAM-DERBY-01","evento":"NORMALIZADO"}'
+```
+
+HTTP 200
+
+```json
+{"ok":true,"alerta":null,"equipamento":"CAM-DERBY-01","status":"OPERANTE"}
+```
+
+`GET /rest/v1/equipamento?codigo=eq.CAM-DERBY-01` → `status: "OPERANTE"`.
+
+### Erros
+
+| Caso | HTTP | Resposta |
+|---|---|---|
+| Sem segredo / segredo errado | 401 | `{"erro":"Não autorizado"}` |
+| `GET` em vez de `POST` | 405 | `{"erro":"Use POST"}` |
+| Equipamento inexistente (`CAM-NAO-EXISTE`) | 404 | `{"erro":"Equipamento CAM-NAO-EXISTE não encontrado"}` |
+| Evento inválido (`INVALIDO`) | 400 | `{"erro":"Informe codigo e evento (SEM_SINAL, FALHA, MOVIMENTO_SUSPEITO, RUIDO_ALTO, NORMALIZADO)"}` |
+
+### Checklist
+
+- [x] Resposta `201` com o alerta
+- [x] Alerta aparece em `vw_alerta_pendente`
+- [x] `CAM-DERBY-01` fica `INOPERANTE` e depois volta a `OPERANTE`
+- [x] Gestores recebem notificação
 
 ```bash
 supabase secrets set DEVICE_SECRET=<segredo>
