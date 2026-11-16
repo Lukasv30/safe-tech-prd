@@ -81,6 +81,8 @@ safe-tech-prd/
 │   ├── supabase/                    # Grants da API, Auth, RLS, Storage, usuários demo (01..05) — só no Supabase
 │   └── scripts/
 │       ├── healthcheck.sh           # Testa a API do Supabase (praças, resumo, RPC)
+│       ├── e2e.mjs                  # Teste ponta a ponta: REST, RPCs, Auth, RLS, Storage, Edge Function
+│       ├── criar_usuarios_demo.sh   # Cadastra os usuários demo pela API do Auth
 │       ├── create_db.sql            # Cria o banco de dados
 │       ├── drop_all.sql             # Remove o schema (reset)
 │       └── run_all.ps1 / run_all.sh # Executa DDL + seeds em ordem
@@ -160,7 +162,8 @@ Para conferir a conexão (lista praças, resumo e consulta um protocolo via RPC)
 
 ```bash
 cp .env.example .env            # preencha SUPABASE_URL e SUPABASE_ANON_KEY
-bash database/scripts/healthcheck.sh
+bash database/scripts/healthcheck.sh      # conexão básica
+node database/scripts/e2e.mjs             # bateria completa (65 testes); evidências em docs/checkpoint-2/evidencias/e2e-api.md
 ```
 
 As regras de negócio (RPCs) e a Edge Function de eventos de equipamentos são descritas em
