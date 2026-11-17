@@ -19,3 +19,9 @@ DROP POLICY IF EXISTS "anexos_delete_dono" ON storage.objects;
 CREATE POLICY "anexos_delete_dono" ON storage.objects
     FOR DELETE TO authenticated
     USING (bucket_id = 'anexos' AND owner_id = auth.uid()::text);
+
+-- O Storage exige SELECT além de DELETE para apagar (e para listar) objetos; leitura pública já vem pelo bucket público.
+DROP POLICY IF EXISTS "anexos_select_logado" ON storage.objects;
+CREATE POLICY "anexos_select_logado" ON storage.objects
+    FOR SELECT TO authenticated
+    USING (bucket_id = 'anexos');
