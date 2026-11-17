@@ -29,8 +29,8 @@ Papéis sugeridos pelo edital: Desenvolvedor Front-end, Desenvolvedor Back-end, 
 | Data | Etapa | Entregáveis | Status |
 |------|-------|-------------|--------|
 | 30/10/2026 | Checkpoint 1 | Repositório criado (com todos os membros adicionados) e Modelagem Lógica do Banco de Dados / DDL inicial | 🟢 Finalizado |
-| 13/11/2026 | Checkpoint 2 | Endpoints principais criados e conexão com o banco de dados funcionando | 🟡 Em andamento |
-| 27/11/2026 | Checkpoint 3 | Aplicação funcional ("MVP" integrado). Front-end consumindo o Back-end | ⚪ Não iniciado |
+| 13/11/2026 | Checkpoint 2 | Endpoints principais criados e conexão com o banco de dados funcionando | 🟢 Finalizado |
+| 27/11/2026 | Checkpoint 3 | Aplicação funcional ("MVP" integrado). Front-end consumindo o Back-end | 🟡 Em andamento |
 | 01/12 a 08/12/2026 | AV2 — Apresentação Oficial | Pitch Técnico, entrega do repositório final e demonstração do software ao vivo | ⚪ Não iniciado |
 
 ### Entregáveis obrigatórios
