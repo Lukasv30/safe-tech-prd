@@ -30,7 +30,7 @@ Papéis sugeridos pelo edital: Desenvolvedor Front-end, Desenvolvedor Back-end, 
 |------|-------|-------------|--------|
 | 30/10/2026 | Checkpoint 1 | Repositório criado (com todos os membros adicionados) e Modelagem Lógica do Banco de Dados / DDL inicial | 🟢 Finalizado |
 | 13/11/2026 | Checkpoint 2 | Endpoints principais criados e conexão com o banco de dados funcionando | 🟢 Finalizado |
-| 27/11/2026 | Checkpoint 3 | Aplicação funcional ("MVP" integrado). Front-end consumindo o Back-end | 🟡 Em andamento |
+| 27/11/2026 | Checkpoint 3 | Aplicação funcional ("MVP" integrado). Front-end consumindo o Back-end | 🟡 Em andamento — plano em [docs/checkpoint-3/](docs/checkpoint-3/README.md) |
 | 01/12 a 08/12/2026 | AV2 — Apresentação Oficial | Pitch Técnico, entrega do repositório final e demonstração do software ao vivo | ⚪ Não iniciado |
 
 ### Entregáveis obrigatórios
@@ -59,7 +59,8 @@ safe-tech-prd/
 ├── docs/
 │   ├── api/                         # Contrato da API (endpoints.md) e coleção de testes (safetech.http)
 │   ├── arquitetura/                 # Template de Documentação (Arquitetura da Solução) — checkpoints 2 e 3
-│   ├── checkpoint-2/                # Plano de ação e roteiro passo a passo de cada membro
+│   ├── checkpoint-2/                # Plano de ação e roteiros do CP2 (endpoints + conexão)
+│   ├── checkpoint-3/                # Plano de ação e roteiros do CP3 (MVP integrado)
 │   ├── requisitos/
 │   │   └── requisitos.md            # Requisitos funcionais e não funcionais
 │   ├── modelagem/
