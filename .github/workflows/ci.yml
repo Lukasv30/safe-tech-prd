@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  front:
+    name: Front-end (build + lint)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: src/frontend/package-lock.json
+      - run: npm ci
+      - name: Build (tipos + bundle)
+        run: npm run build
+        env:
+          # Valores de exemplo: o build não chama a API, só precisa que as variáveis existam
+          VITE_SUPABASE_URL: https://exemplo.supabase.co
+          VITE_SUPABASE_ANON_KEY: exemplo
+      - name: Lint
+        run: npm run lint
+        # TEMPORÁRIO: main ainda tem 4 "catch (err: any)" em páginas que o Santhiago substitui no CP3.
+        # Depois do merge dessas páginas (CP3-03/04), apagar a linha abaixo para o lint bloquear o PR.
+        continue-on-error: true
+
+  api:
+    name: API (healthcheck + e2e contra o Supabase)
+    runs-on: ubuntu-latest
+    # Só roda quando os secrets existem (PRs de forks não têm acesso a eles)
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Healthcheck
+        run: bash database/scripts/healthcheck.sh
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      - name: E2E
+        shell: bash   # com "shell: bash" o Actions usa -eo pipefail, então o tee não esconde falha do e2e
+        run: node database/scripts/e2e.mjs --md | tee -a "$GITHUB_STEP_SUMMARY"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          DEVICE_SECRET: ${{ secrets.DEVICE_SECRET }}

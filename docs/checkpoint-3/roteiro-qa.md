@@ -46,7 +46,7 @@ navegador para trocar de usuário sem conflito de sessão. Registre resultado, n
 | CT29 | Gestor | Login → Dashboard → trocar 7 / 30 / 90 dias | Cai em `/dashboard`; indicadores e gráficos mudam com o período; ranking com 3 praças |
 | CT30 | Gestor | Painel → "Cancelar ocorrência" numa ABERTA | Sai da fila; protocolo mostra CANCELADA; cidadão autor ainda a vê em Minhas ocorrências |
 | CT31 | Todos | Abrir a URL no celular (ou DevTools 390 px) | Menu quebra em linhas, tabelas roláveis, formulários usáveis, sem rolagem horizontal da página |
-| CT32 | API | `node database/scripts/e2e.mjs` (pedir ao Lucas a saída) | 82/82 OK |
+| CT32 | API | `node database/scripts/e2e.mjs` (pedir ao Lucas a saída) | 85/85 OK |
 
 ## Como registrar
 

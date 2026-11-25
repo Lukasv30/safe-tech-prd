@@ -56,6 +56,8 @@ safe-tech-prd/
 ├── README.md
 ├── .env.example                     # Modelo das variáveis do healthcheck (SUPABASE_URL, SUPABASE_ANON_KEY)
 ├── .gitignore
+├── .github/
+│   └── workflows/ci.yml             # CI: build + lint do front, healthcheck + e2e da API em todo PR
 ├── docs/
 │   ├── api/                         # Contrato da API (endpoints.md) e coleção de testes (safetech.http)
 │   ├── arquitetura/                 # Template de Documentação (Arquitetura da Solução) — checkpoints 2 e 3
@@ -78,11 +80,13 @@ safe-tech-prd/
 │   │   ├── 04_triggers.sql          # Triggers (atualizado_em, histórico de status)
 │   │   └── 05_views.sql             # Views de apoio (dashboard, ocorrências abertas)
 │   ├── seeds/
-│   │   └── 01_seed_dev.sql          # Dados iniciais para desenvolvimento
+│   │   ├── 01_seed_dev.sql          # Dados iniciais para desenvolvimento
+│   │   └── 02_seed_demo_cp3.sql     # Massa de dados para a demonstração do MVP
 │   ├── supabase/                    # Grants da API, Auth, RLS, Storage, usuários demo (01..05) — só no Supabase
 │   └── scripts/
 │       ├── healthcheck.sh           # Testa a API do Supabase (praças, resumo, RPC)
 │       ├── e2e.mjs                  # Teste ponta a ponta: REST, RPCs, Auth, RLS, Storage, Edge Function
+│       ├── limpar_e2e.sql           # Remove os registros [E2E] antes de apresentar
 │       ├── criar_usuarios_demo.sh   # Cadastra os usuários demo pela API do Auth
 │       ├── create_db.sql            # Cria o banco de dados
 │       ├── drop_all.sql             # Remove o schema (reset)
@@ -93,7 +97,7 @@ safe-tech-prd/
 │       └── evento-equipamento/      # Edge Function: eventos de câmeras/sensores → alertas
 └── src/
     ├── backend/                     # Reservado (a lógica de servidor vive no Supabase: RPC + Edge Functions)
-    └── frontend/                    # React + Vite + supabase-js
+    └── frontend/                    # React + Vite + supabase-js (vercel.json: deploy na Vercel)
 ```
 
 ## Back-end: Supabase (Checkpoint 2)
@@ -154,6 +158,12 @@ A mesma DDL do Checkpoint 1 foi aplicada no **SQL Editor** e, em seguida, os scr
 | 5 | `database/supabase/03_rls.sql` | Row Level Security por perfil (cidadão vê só as próprias ocorrências; equipe vê alertas, atendimentos e rondas; gestor cadastra praças) |
 | 6 | `database/supabase/04_storage.sql` | Políticas do bucket `anexos` (leitura pública, upload só logado, cada um apaga só o que enviou) |
 | 7 | `database/supabase/05_users_teste.sql` | Promove os usuários demo criados no painel (`*.demo@safetech.app`) para AGENTE, GESTOR e ADMIN |
+| 8 | `database/supabase/08_supabase_rpc.sql` | RPCs de negócio do CP2: registrar/consultar ocorrência, status, atendimento, alertas, botão de pânico, minhas ocorrências |
+| 9 | `database/supabase/09_rpc_cp3.sql` | RPCs do MVP: `detalhe_praca`, `avaliar_praca`, `registrar_anexo`, `dashboard_resumo` |
+| 10 | `database/supabase/10_hardening_cp3.sql` | Views `vw_ocorrencia_aberta` e `vw_alerta_pendente` passam a respeitar o RLS (`security_invoker`), Realtime em `alerta` e `ocorrencia`, uma avaliação por usuário/praça, exclusão do próprio anexo |
+| 11 | `database/seeds/02_seed_demo_cp3.sql` | Massa de dados para a demonstração (30 dias de ocorrências, alertas, rondas, avaliações). Idempotente |
+
+Antes de uma apresentação, `database/scripts/limpar_e2e.sql` remove os registros `[E2E]` criados pelos testes.
 
 Configurações feitas no painel (não ficam em SQL): schema `safetech` adicionado em **Settings → API → Exposed
 schemas**; confirmação de e-mail desativada em **Authentication → Providers → Email** (ambiente de
@@ -164,7 +174,7 @@ Para conferir a conexão (lista praças, resumo e consulta um protocolo via RPC)
 ```bash
 cp .env.example .env            # preencha SUPABASE_URL e SUPABASE_ANON_KEY
 bash database/scripts/healthcheck.sh      # conexão básica
-node database/scripts/e2e.mjs             # bateria completa (65 testes); evidências em docs/checkpoint-2/evidencias/e2e-api.md
+node database/scripts/e2e.mjs             # bateria completa (65 do CP2 + 20 do CP3); evidências em docs/checkpoint-*/evidencias/e2e-api.md
 ```
 
 As regras de negócio (RPCs) e a Edge Function de eventos de equipamentos são descritas em

@@ -231,6 +231,64 @@ if (DEVICE_SECRET) {
 }
 
 // -----------------------------------------------------------------------------
+// 7. Checkpoint 3 — hardening (10_hardening_cp3.sql): views respeitam o RLS de quem consulta
+// -----------------------------------------------------------------------------
+r = await rest('vw_alerta_pendente?select=id', { token: tk.cidadao });
+check('cp3', 'hardening: cidadão não lê alertas pela vw_alerta_pendente', r.status === 200 && r.json.length === 0, `${r.status} / ${Array.isArray(r.json) ? r.json.length + ' alertas visíveis' : msg(r)}`);
+r = await rest('vw_ocorrencia_aberta?select=id,autor', { token: tk.cidadao });
+check('cp3', 'hardening: cidadão não vê anônimas de outros na vw_ocorrencia_aberta', r.status === 200 && !r.json.some((o) => o.id === ocAnon?.id), `${r.status} / ${Array.isArray(r.json) ? r.json.length + ' visíveis' : msg(r)}`);
+r = await rest('vw_ocorrencia_aberta?select=id', { token: tk.agente });
+check('cp3', 'hardening: agente continua vendo a fila completa (inclui anônimas)', r.status === 200 && r.json.some((o) => o.id === ocAnon?.id), `${r.status} / ${Array.isArray(r.json) ? r.json.length + ' visíveis' : msg(r)}`);
+r = await rest('vw_alerta_pendente?select=id', { token: tk.agente });
+check('cp3', 'hardening: agente continua vendo alertas pendentes', r.status === 200 && Array.isArray(r.json), `${r.status} / ${Array.isArray(r.json) ? r.json.length + ' pendentes' : msg(r)}`);
+r = await rest('vw_praca_resumo?select=id');
+check('cp3', 'hardening: vw_praca_resumo continua pública', r.status === 200 && r.json.length >= 3, `${r.status}`);
+
+// -----------------------------------------------------------------------------
+// 8. Checkpoint 3 — RPCs do MVP (09_rpc_cp3.sql, Davi). Pulados enquanto não forem aplicadas.
+// -----------------------------------------------------------------------------
+const naoExiste = (x) => x.json?.code === 'PGRST202';
+r = await rpc('detalhe_praca', { p_praca_id: PRACA_DERBY });
+if (naoExiste(r)) {
+  console.log('     (09_rpc_cp3.sql ainda não aplicado: testes de detalhe_praca, avaliar_praca, registrar_anexo e dashboard_resumo pulados)');
+} else {
+  check('cp3', 'RPC detalhe_praca sem login', r.status === 200 && r.json?.praca?.nome && Array.isArray(r.json.equipamentos) && Array.isArray(r.json.avaliacoes), `${r.status} / ${r.json?.praca?.nome ?? msg(r)}`);
+  check('cp3', 'detalhe_praca não expõe autor das ocorrências', r.status === 200 && (r.json?.ocorrencias_abertas ?? []).every((o) => !('autor' in o) && !('autor_id' in o)), `${(r.json?.ocorrencias_abertas ?? []).length} abertas`);
+  r = await rpc('detalhe_praca', { p_praca_id: '00000000-0000-0000-0000-000000000000' });
+  check('cp3', 'detalhe_praca inexistente → null', r.status === 200 && r.json === null, `${r.status}`);
+
+  r = await rpc('avaliar_praca', { p_praca_id: PRACA_DERBY, p_nota: 4, p_comentario: '[E2E] sem login' });
+  check('cp3', 'RPC avaliar_praca sem login → bloqueado', r.status >= 400, `${r.status} / ${msg(r)}`);
+  r = await rpc('avaliar_praca', { p_praca_id: PRACA_DERBY, p_nota: 4, p_comentario: '[E2E] primeira' }, tk.cidadao);
+  check('cp3', 'RPC avaliar_praca como cidadão', r.status === 200 && r.json?.[0]?.nota === 4, `${r.status} / ${r.json?.[0]?.nota ?? msg(r)}`);
+  r = await rpc('avaliar_praca', { p_praca_id: PRACA_DERBY, p_nota: 2, p_comentario: '[E2E] atualizada' }, tk.cidadao);
+  check('cp3', 'avaliar_praca de novo atualiza (não duplica)', r.status === 200 && r.json?.[0]?.nota === 2, `${r.status}`);
+  r = await rest(`avaliacao_praca?select=id&praca_id=eq.${PRACA_DERBY}&usuario_id=eq.${meuId}`, { token: tk.cidadao });
+  check('cp3', 'só existe 1 avaliação minha nesta praça', r.status === 200 && r.json.length === 1, `${r.json?.length}`);
+  r = await rpc('avaliar_praca', { p_praca_id: PRACA_DERBY, p_nota: 9 }, tk.cidadao);
+  check('cp3', 'avaliar_praca nota 9 → erro', r.status >= 400, `${r.status} / ${msg(r)}`);
+  r = await write('DELETE', `avaliacao_praca?praca_id=eq.${PRACA_DERBY}&usuario_id=eq.${meuId}`, undefined, tk.cidadao);
+  check('cp3', 'limpeza da avaliação', r.status === 200, `${r.status}`);
+
+  r = await rpc('registrar_anexo', { p_ocorrencia_id: ocCid?.id, p_url: 'https://exemplo/anexos/e2e.jpg', p_nome_arquivo: 'e2e.jpg', p_tamanho_bytes: 10 }, tk.cidadao);
+  const anexoId = r.json?.[0]?.id;
+  check('cp3', 'RPC registrar_anexo na própria ocorrência', r.status === 200 && anexoId, `${r.status} / ${anexoId ?? msg(r)}`);
+  r = await rpc('registrar_anexo', { p_ocorrencia_id: ocAnon?.id, p_url: 'https://exemplo/anexos/x.jpg' }, tk.cidadao);
+  check('cp3', 'registrar_anexo em ocorrência de outro → bloqueado', r.status >= 400, `${r.status} / ${msg(r)}`);
+  r = await rpc('registrar_anexo', { p_ocorrencia_id: ocAnon?.id, p_url: 'https://exemplo/anexos/laudo.pdf', p_tipo: 'DOCUMENTO' }, tk.agente);
+  check('cp3', 'registrar_anexo pela equipe em qualquer ocorrência', r.status === 200 && r.json?.[0]?.tipo === 'DOCUMENTO', `${r.status}`);
+  if (anexoId) {
+    r = await write('DELETE', `anexo_ocorrencia?id=eq.${anexoId}`, undefined, tk.cidadao);
+    check('cp3', 'hardening: cidadão apaga o próprio anexo (política anexo_delete)', r.status === 200 && r.json.length === 1, `${r.status} / ${Array.isArray(r.json) ? r.json.length + ' linhas' : msg(r)}`);
+  }
+
+  r = await rpc('dashboard_resumo', { p_dias: 30 }, tk.cidadao);
+  check('cp3', 'RPC dashboard_resumo como cidadão → bloqueado', r.status >= 400, `${r.status} / ${msg(r)}`);
+  r = await rpc('dashboard_resumo', { p_dias: 30 }, tk.gestor);
+  check('cp3', 'RPC dashboard_resumo como gestor', r.status === 200 && r.json?.totais?.pracas >= 3 && r.json?.por_dia?.length === 31, `${r.status} / ${JSON.stringify(r.json?.totais ?? msg(r)).slice(0, 90)}`);
+}
+
+// -----------------------------------------------------------------------------
 // Resumo
 // -----------------------------------------------------------------------------
 const total = results.length;

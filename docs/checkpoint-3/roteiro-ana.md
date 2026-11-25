@@ -107,7 +107,7 @@ Seções a acrescentar ou atualizar (mantenha o que já existe do CP2):
    `RotaProtegida`, convenção "uma função por endpoint em `api/*.ts`".
 4. **Segurança** — tabela perfil × recurso (pegue do roteiro de QA), `security_invoker`, anonimato, chaves fora
    do código, CI sem segredos em forks.
-5. **Qualidade** — CI (lint, build, e2e), 82 testes de API, PGlite para validar SQL antes de aplicar, PR com
+5. **Qualidade** — CI (lint, build, e2e), 85 testes de API, PGlite para validar SQL antes de aplicar, PR com
    revisão cruzada.
 6. **Decisões (ADR curto)** — por que Supabase, por que RPC em vez de back-end próprio, por que gráficos em CSS
    (sem dependência), por que Vercel.
@@ -154,7 +154,7 @@ Roteiro de 10 min para sexta (quem fala em cada parte):
 | 0–1 | Ana | Problema, o que era o CP2, o que é o MVP agora. Mostra a matriz de aderência. |
 | 1–4 | Santhiago | Cidadão na URL pública: cadastro → praça → ocorrência com foto → protocolo. |
 | 4–7 | Davi | Agente: painel → assume → resolve (volta no protocolo do Santhiago: linha do tempo). Dispara botão de pânico → alerta chega ao vivo → reconhece. |
-| 7–8,5 | Lucas | Gestor: dashboard. Mostra CI verde e e2e 82/82. |
+| 7–8,5 | Lucas | Gestor: dashboard. Mostra CI verde e e2e 85/85. |
 | 8,5–10 | Ana | Arquitetura em 1 slide, limitações, o que vem para a AV2. Perguntas. |
 
 Para a AV2 (01–08/12), comece `docs/apresentacao/pitch.md`: problema (dados de insegurança em praças do Recife),
